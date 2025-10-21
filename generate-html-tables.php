@@ -81,17 +81,18 @@ $htmlContent .= "<h1>WordPress Plugin Statistics</h1>\n\n";
 $htmlContent .= "<div class=\"toc\">\n";
 $htmlContent .= "<h2>Table of Contents</h2>\n";
 $htmlContent .= "<ul>\n";
-$htmlContent .= "<li><a href=\"#summary\">Summary Statistics</a></li>\n";
-$htmlContent .= "<li><a href=\"#top-100-status\">Top 100 Plugins - Preview Status</a></li>\n";
+$htmlContent .= "<li><a href=\"#summary\">Summary</a></li>\n";
+$htmlContent .= "<li><a href=\"#top-100-status\">Which Plugins in the Top 100 have a Preview?</a></li>\n";
+$htmlContent .= "<li><a href=\"#p2-tasks\">Top 100 Plugins Without Previews - P2 Tasks</a></li>\n";
 $htmlContent .= "<li><a href=\"#plugins-with-blueprints\">Plugins with Blueprints (" . number_format( count( $pluginsWithBlueprints ) ) . ")</a></li>\n";
 $htmlContent .= "<li><a href=\"#plugins-without-blueprints\">Top 100 Plugins without Blueprints</a></li>\n";
 $htmlContent .= "<li><a href=\"#plugins-top-100\">Top 100 Plugins (All)</a></li>\n";
 $htmlContent .= "</ul>\n";
 $htmlContent .= "</div>\n\n";
 
-echo "Generating summary statistics table...\n";
+echo "Generating summary table...\n";
 $wpSummaryHtml = "<!-- wp:heading -->\n";
-$wpSummaryHtml .= "<h2 class=\"wp-block-heading\" id=\"summary\">Summary Statistics</h2>\n";
+$wpSummaryHtml .= "<h2 class=\"wp-block-heading\" id=\"summary\">Summary</h2>\n";
 $wpSummaryHtml .= "<!-- /wp:heading -->\n\n";
 $wpSummaryHtml .= "<!-- wp:table {\"hasFixedLayout\":false} -->\n";
 $wpSummaryHtml .= "<figure class=\"wp-block-table\"><table><thead><tr><th></th><th>Plugins with Previews</th><th>Percent</th></tr></thead><tbody>";
@@ -102,8 +103,8 @@ $wpSummaryHtml .= "<!-- /wp:table -->";
 
 $htmlContent .= "<div class=\"section\">\n";
 $htmlContent .= "<div class=\"section-header\">\n";
-$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"summary\">Summary Statistics</h2>\n";
-$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('summary-wp')\">Copy WordPress HTML</button>\n";
+$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"summary\">Summary</h2>\n";
+$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('summary-wp', this)\">Copy Table HTML</button>\n";
 $htmlContent .= "</div>\n";
 $htmlContent .= "<div class=\"wordpress-html\" id=\"summary-wp\">" . htmlspecialchars( $wpSummaryHtml ) . "</div>\n";
 $htmlContent .= "<figure class=\"wp-block-table\"><table><thead><tr><th></th><th>Plugins with Previews</th><th>Percent</th></tr></thead><tbody>";
@@ -114,7 +115,7 @@ $htmlContent .= "</div>\n\n";
 
 echo "Generating Top 100 plugins preview status table...\n";
 $wpTop100StatusHtml = "<!-- wp:heading -->\n";
-$wpTop100StatusHtml .= "<h2 class=\"wp-block-heading\" id=\"top-100-status\">Top 100 Plugins - Preview Status</h2>\n";
+$wpTop100StatusHtml .= "<h2 class=\"wp-block-heading\" id=\"top-100-status\">Which Plugins in the Top 100 have a Preview?</h2>\n";
 $wpTop100StatusHtml .= "<!-- /wp:heading -->\n\n";
 $wpTop100StatusHtml .= "<!-- wp:table {\"hasFixedLayout\":false} -->\n";
 $wpTop100StatusHtml .= "<figure class=\"wp-block-table\"><table><thead><tr><th>Rank</th><th>Plugin Preview</th><th>Enabled</th></tr></thead><tbody>";
@@ -122,7 +123,7 @@ $wpTop100StatusHtml .= "<figure class=\"wp-block-table\"><table><thead><tr><th>R
 $top100TableRows = '';
 $rank = 1;
 foreach ( $pluginsTop100 as $slug => $plugin ) {
-	$name = htmlspecialchars( $plugin['name'] );
+	$name = htmlspecialchars( html_entity_decode( $plugin['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
 	$pluginUrl = "https://wordpress.org/plugins/{$slug}/";
 
 	$row = "<tr>";
@@ -147,13 +148,58 @@ $wpTop100StatusHtml .= "<!-- /wp:table -->";
 
 $htmlContent .= "<div class=\"section\">\n";
 $htmlContent .= "<div class=\"section-header\">\n";
-$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"top-100-status\">Top 100 Plugins - Preview Status</h2>\n";
-$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('top-100-status-wp')\">Copy WordPress HTML</button>\n";
+$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"top-100-status\">Which Plugins in the Top 100 have a Preview?</h2>\n";
+$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('top-100-status-wp', this)\">Copy Table HTML</button>\n";
 $htmlContent .= "</div>\n";
 $htmlContent .= "<div class=\"wordpress-html\" id=\"top-100-status-wp\">" . htmlspecialchars( $wpTop100StatusHtml ) . "</div>\n";
 $htmlContent .= "<figure class=\"wp-block-table\"><table><thead><tr><th>Rank</th><th>Plugin Preview</th><th>Enabled</th></tr></thead><tbody>";
 $htmlContent .= $top100TableRows;
 $htmlContent .= "</tbody></table></figure>\n";
+$htmlContent .= "</div>\n\n";
+
+echo "Generating P2 task list for plugins without previews...\n";
+$wpP2TasksHtml = "<!-- wp:heading -->\n";
+$wpP2TasksHtml .= "<h2 class=\"wp-block-heading\" id=\"p2-tasks\">Top 100 Plugins Without Previews - P2 Tasks</h2>\n";
+$wpP2TasksHtml .= "<!-- /wp:heading -->\n\n";
+$wpP2TasksHtml .= "<!-- wp:group -->\n";
+$wpP2TasksHtml .= "<div class=\"wp-block-group\">\n";
+
+$p2TasksHtml = '';
+$rank = 1;
+foreach ( $pluginsTop100 as $slug => $plugin ) {
+	if ( isset( $plugin['preview_url'] ) && $plugin['preview_url'] !== false ) {
+		$rank++;
+		continue;
+	}
+
+	$name = html_entity_decode( $plugin['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$pluginUrl = "https://wordpress.org/plugins/{$slug}/";
+	$playgroundUrl = "https://playground.wordpress.net/?plugin={$slug}";
+	$stepLibraryUrl = "https://akirk.github.io/playground-step-library/#blueprintRecorder&amp;&amp;installPlugin__plugin-.-{$slug}";
+
+	$taskContent = "{$rank}: <a href=\"{$pluginUrl}\">{$name}</a>: <a href=\"{$playgroundUrl}\">Playground</a>, <a href=\"{$stepLibraryUrl}\">Step Library</a>";
+
+	$task = "<!-- wp:p2/task -->\n";
+	$task .= "<div class=\"wp-block-p2-task\"><div><span class=\"wp-block-p2-task__emoji-status\" title=\"Pending\">⬜ </span><div class=\"wp-block-p2-task__checkbox-wrapper\"><span title=\"Pending\" class=\"wp-block-p2-task__checkbox is-disabled is-aria-checked-false\"></span></div></div><div class=\"wp-block-p2-task__main\"><div class=\"wp-block-p2-task__left\"><div class=\"wp-block-p2-task__content-wrapper\"><span class=\"wp-block-p2-task__content\">{$taskContent}</span></div><div class=\"wp-block-p2-task__dates\"></div></div><div class=\"wp-block-p2-task__right\"><div class=\"wp-block-p2-task__assignees-avatars\"></div></div></div></div>\n";
+	$task .= "<!-- /wp:p2/task -->\n\n";
+
+	$wpP2TasksHtml .= $task;
+	$p2TasksHtml .= $task;
+	$rank++;
+}
+
+$wpP2TasksHtml .= "</div>\n";
+$wpP2TasksHtml .= "<!-- /wp:group -->";
+
+$htmlContent .= "<div class=\"section\">\n";
+$htmlContent .= "<div class=\"section-header\">\n";
+$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"p2-tasks\">Top 100 Plugins Without Previews - P2 Tasks</h2>\n";
+$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('p2-tasks-wp', this)\">Copy Table HTML</button>\n";
+$htmlContent .= "</div>\n";
+$htmlContent .= "<div class=\"wordpress-html\" id=\"p2-tasks-wp\">" . htmlspecialchars( $wpP2TasksHtml ) . "</div>\n";
+$htmlContent .= "<div class=\"wp-block-group\">\n";
+$htmlContent .= $p2TasksHtml;
+$htmlContent .= "</div>\n";
 $htmlContent .= "</div>\n\n";
 
 $sections = [
@@ -218,7 +264,7 @@ foreach ( $sections as $section ) {
 	$count = 0;
 	foreach ( $section['data'] as $slug => $plugin ) {
 		$count++;
-		$name = htmlspecialchars( $plugin['name'] );
+		$name = htmlspecialchars( html_entity_decode( $plugin['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
 		$downloaded = number_format( $plugin['downloaded'] );
 		$activeInstalls = number_format( $plugin['active_installs'] );
 
@@ -248,7 +294,7 @@ foreach ( $sections as $section ) {
 	$htmlContent .= "<div class=\"section\">\n";
 	$htmlContent .= "<div class=\"section-header\">\n";
 	$htmlContent .= "<h2 class=\"wp-block-heading\" id=\"{$section['id']}\">{$section['title']}</h2>\n";
-	$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('{$section['id']}-wp')\">Copy WordPress HTML</button>\n";
+	$htmlContent .= "<button class=\"copy-btn\" onclick=\"copyToClipboard('{$section['id']}-wp', this)\">Copy Table HTML</button>\n";
 	$htmlContent .= "</div>\n";
 	$htmlContent .= "<div class=\"wordpress-html\" id=\"{$section['id']}-wp\">" . htmlspecialchars( $wpSectionHtml ) . "</div>\n";
 	$htmlContent .= '<figure class="wp-block-table"><table>' . $tableHeaderHtml . '<tbody>';
@@ -260,19 +306,18 @@ foreach ( $sections as $section ) {
 }
 
 $htmlContent .= "<script>\n";
-$htmlContent .= "function copyToClipboard(elementId) {\n";
+$htmlContent .= "function copyToClipboard(elementId, buttonElement) {\n";
 $htmlContent .= "  const element = document.getElementById(elementId);\n";
 $htmlContent .= "  const text = element.textContent;\n";
 $htmlContent .= "  \n";
 $htmlContent .= "  navigator.clipboard.writeText(text).then(() => {\n";
-$htmlContent .= "    const button = event.target;\n";
-$htmlContent .= "    const originalText = button.textContent;\n";
-$htmlContent .= "    button.textContent = 'Copied!';\n";
-$htmlContent .= "    button.classList.add('copied');\n";
+$htmlContent .= "    const originalText = buttonElement.textContent;\n";
+$htmlContent .= "    buttonElement.textContent = 'Copied!';\n";
+$htmlContent .= "    buttonElement.classList.add('copied');\n";
 $htmlContent .= "    \n";
 $htmlContent .= "    setTimeout(() => {\n";
-$htmlContent .= "      button.textContent = originalText;\n";
-$htmlContent .= "      button.classList.remove('copied');\n";
+$htmlContent .= "      buttonElement.textContent = originalText;\n";
+$htmlContent .= "      buttonElement.classList.remove('copied');\n";
 $htmlContent .= "    }, 2000);\n";
 $htmlContent .= "  }).catch(err => {\n";
 $htmlContent .= "    console.error('Failed to copy:', err);\n";
@@ -303,4 +348,4 @@ if ( PHP_OS_FAMILY === 'Darwin' ) {
 	echo "\nYou can open the file in your browser: {$outputFile}\n";
 }
 
-echo "\nClick the 'Copy WordPress HTML' button next to any section to copy its Gutenberg-ready HTML.\n";
+echo "\nClick the 'Copy Table HTML' button next to any section to copy its Gutenberg-ready HTML.\n";
