@@ -1,0 +1,26 @@
+# Downloaded data
+trunk.zip
+*.zip.tmp
+
+# Generated JSON files
+plugins-with-blueprints.json
+plugins-without-blueprints.json
+plugins-top-100.json
+
+# Generated HTML
+tables.html
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Composer
+/vendor/
+composer.lock

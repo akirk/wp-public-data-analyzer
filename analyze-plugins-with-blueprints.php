@@ -1,0 +1,75 @@
+<?php
+/**
+ * Analyzes plugins with blueprints
+ */
+
+$zipFile = __DIR__ . '/trunk.zip';
+$outputFile = __DIR__ . '/plugins-with-blueprints.json';
+
+if ( !file_exists( $zipFile ) ) {
+	echo "Error: {$zipFile} not found. Run update-data.php first.\n";
+	exit( 1 );
+}
+
+echo "Opening zip file...\n";
+$zip = new ZipArchive();
+if ( $zip->open( $zipFile ) !== true ) {
+	echo "Error: Failed to open zip file\n";
+	exit( 1 );
+}
+
+echo "Processing plugin JSON files...\n";
+$plugins = [];
+$processedCount = 0;
+
+for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+	$filename = $zip->getNameIndex( $i );
+
+	if ( preg_match( '#/plugins/[^/]+/[^/]+\.json$#', $filename ) ) {
+		$content = $zip->getFromIndex( $i );
+		if ( $content === false ) {
+			continue;
+		}
+
+		$data = json_decode( $content, true );
+		if ( !$data ) {
+			continue;
+		}
+
+		$processedCount++;
+		if ( $processedCount % 1000 === 0 ) {
+			echo "Processed {$processedCount} plugins...\n";
+		}
+
+		if ( isset( $data['blueprints'] ) && is_array( $data['blueprints'] ) && count( $data['blueprints'] ) > 0 ) {
+			$plugins[] = [
+				'name' => $data['name'] ?? '',
+				'slug' => $data['slug'] ?? '',
+				'downloaded' => $data['downloaded'] ?? 0,
+				'active_installs' => $data['active_installs'] ?? 0,
+				'preview_url' => 'https://wordpress.org/plugins/' . ( $data['slug'] ?? '' ) . '/?preview=1',
+			];
+		}
+	}
+}
+
+$zip->close();
+
+echo "Found " . count( $plugins ) . " plugins with blueprints\n";
+echo "Sorting by active installs...\n";
+
+usort( $plugins, function( $a, $b ) {
+	return $b['active_installs'] - $a['active_installs'];
+} );
+
+$result = [];
+foreach ( $plugins as $plugin ) {
+	$slug = $plugin['slug'];
+	unset( $plugin['slug'] );
+	$result[$slug] = $plugin;
+}
+
+echo "Writing output to {$outputFile}...\n";
+file_put_contents( $outputFile, json_encode( $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) );
+
+echo "Done! Processed {$processedCount} total plugins, found " . count( $plugins ) . " with blueprints\n";

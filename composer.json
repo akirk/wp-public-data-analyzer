@@ -1,0 +1,24 @@
+{
+	"name": "akirk/wp-public-data-analyzer",
+	"description": "Scripts for analyzing WordPress public data",
+	"type": "project",
+	"require": {
+		"php": ">=7.4"
+	},
+	"scripts": {
+		"update": "php update-data.php",
+		"analyze:plugins-with-blueprints": "php analyze-plugins-with-blueprints.php",
+		"analyze:plugins-without-blueprints": "php analyze-plugins-without-blueprints.php",
+		"analyze:plugins-top-100": "php analyze-plugins-top-100.php",
+		"analyze:all": [
+			"@analyze:plugins-with-blueprints",
+			"@analyze:plugins-without-blueprints",
+			"@analyze:plugins-top-100"
+		],
+		"generate:html": "php generate-html-tables.php",
+		"build": [
+			"@analyze:all",
+			"@generate:html"
+		]
+	}
+}
