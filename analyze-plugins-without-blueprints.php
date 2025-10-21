@@ -42,12 +42,28 @@ for ( $i = 0; $i < $zip->numFiles; $i++ ) {
 		}
 
 		if ( isset( $data['blueprints'] ) && is_array( $data['blueprints'] ) && count( $data['blueprints'] ) === 0 ) {
+			$slug = $data['slug'] ?? '';
+			$blueprintData = [
+				'steps' => [
+					[
+						'step' => 'installPlugin',
+						'vars' => [
+							'url' => $slug,
+							'prs' => false,
+							'permalink' => false,
+						],
+					],
+				],
+			];
+			$blueprintJson = json_encode( $blueprintData );
+			$blueprintBase64 = base64_encode( $blueprintJson );
+
 			$plugins[] = [
 				'name' => $data['name'] ?? '',
-				'slug' => $data['slug'] ?? '',
+				'slug' => $slug,
 				'downloaded' => $data['downloaded'] ?? 0,
 				'active_installs' => $data['active_installs'] ?? 0,
-				'url' => 'https://akirk.github.io/playground-step-library/#installPlugin__plugin-.-' . ( $data['slug'] ?? '' ),
+				'url' => 'https://akirk.github.io/playground-step-library/#' . $blueprintBase64,
 			];
 		}
 	}

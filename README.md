@@ -12,7 +12,7 @@ Analyzes WordPress plugin data from [wp-public-data](https://github.com/dd32/wp-
 
 ```bash
 # Download/update data (auto-updates if older than 7 days)
-composer update
+composer update-data
 
 # Analyze plugins and generate HTML tables
 composer build
@@ -29,6 +29,4 @@ composer generate:html
 - `plugins-with-blueprints.json` - All plugins with blueprints
 - `plugins-without-blueprints.json` - Top 100 plugins without blueprints
 - `plugins-top-100.json` - Top 100 plugins by active installs
-- `tables.html` - Interactive HTML tables with copy buttons for WordPress Gutenberg
-
-The HTML file opens automatically in your browser. Click "Copy WordPress HTML" buttons to copy Gutenberg-ready markup.
+- `tables.html` - Generated HTML report of the JSON files

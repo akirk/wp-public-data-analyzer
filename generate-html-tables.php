@@ -52,7 +52,7 @@ $htmlContent .= "<meta charset=\"UTF-8\">\n";
 $htmlContent .= "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
 $htmlContent .= "<title>WordPress Plugin Statistics</title>\n";
 $htmlContent .= "<style>\n";
-$htmlContent .= "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; background: #fff; }\n";
+$htmlContent .= "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif; max-width: 1400px; margin: 60px auto 20px; padding: 20px; background: #fff; }\n";
 $htmlContent .= ".wp-block-table table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }\n";
 $htmlContent .= ".wp-block-table th { background-color: #f5f5f5; font-weight: 600; padding: 12px; text-align: left; border: 1px solid #ddd; }\n";
 $htmlContent .= ".wp-block-table td { padding: 10px; border: 1px solid #ddd; }\n";
@@ -60,10 +60,14 @@ $htmlContent .= ".wp-block-table tbody tr:nth-child(even) { background-color: #f
 $htmlContent .= ".wp-block-table tbody tr:hover { background-color: #f0f0f0; }\n";
 $htmlContent .= ".wp-block-table a { color: #0073aa; text-decoration: none; }\n";
 $htmlContent .= ".wp-block-table a:hover { text-decoration: underline; }\n";
-$htmlContent .= ".toc { background-color: #f9f9f9; padding: 20px; border-left: 4px solid #0073aa; margin-bottom: 30px; }\n";
-$htmlContent .= ".toc h2 { margin-top: 0; }\n";
-$htmlContent .= ".toc ul { list-style-type: none; padding-left: 0; }\n";
-$htmlContent .= ".toc li { margin: 8px 0; }\n";
+$htmlContent .= ".fixed-nav { position: fixed; top: 0; left: 0; right: 0; background: #0073aa; color: white; padding: 12px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; display: flex; align-items: center; gap: 10px; overflow-x: auto; white-space: nowrap; }\n";
+$htmlContent .= ".fixed-nav-title { font-weight: 600; margin-right: 10px; }\n";
+$htmlContent .= ".fixed-nav a { color: white; text-decoration: none; border-radius: 3px; transition: background 0.2s; font-size: 14px; }\n";
+$htmlContent .= ".fixed-nav a:hover { background: rgba(255,255,255,0.2); }\n";
+$htmlContent .= ".fixed-nav-separator { color: rgba(255,255,255,0.5); }\n";
+$htmlContent .= ".filter-input { padding: 6px 12px; border: none; border-radius: 3px; font-size: 14px; min-width: 200px; }\n";
+$htmlContent .= ".filter-input:focus { outline: 2px solid rgba(255,255,255,0.5); }\n";
+$htmlContent .= ".hidden { display: none !important; }\n";
 $htmlContent .= ".section { position: relative; margin-bottom: 40px; }\n";
 $htmlContent .= ".section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }\n";
 $htmlContent .= ".copy-btn { background: #0073aa; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; }\n";
@@ -72,23 +76,36 @@ $htmlContent .= ".copy-btn:active { background: #004368; }\n";
 $htmlContent .= ".copy-btn.copied { background: #00a32a; }\n";
 $htmlContent .= ".wordpress-html { display: none; }\n";
 $htmlContent .= "h2.wp-block-heading { margin: 0; }\n";
+$htmlContent .= ".wp-block-p2-task { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; background: #fff; }\n";
+$htmlContent .= ".wp-block-p2-task__emoji-status { font-size: 18px; }\n";
+$htmlContent .= ".wp-block-p2-task__checkbox-wrapper { display: none; }\n";
+$htmlContent .= ".wp-block-p2-task__checkbox { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: inline-block; background: #fff; }\n";
+$htmlContent .= ".wp-block-p2-task__main { flex: 1; }\n";
+$htmlContent .= ".wp-block-p2-task__content { line-height: 1.5; }\n";
+$htmlContent .= ".wp-block-p2-task:hover { background: #f9f9f9; border-color: #0073aa; }\n";
+$htmlContent .= ".wp-block-group { display: flex; flex-direction: column; }\n";
 $htmlContent .= "</style>\n";
 $htmlContent .= "</head>\n";
 $htmlContent .= "<body>\n\n";
 
-$htmlContent .= "<h1>WordPress Plugin Statistics</h1>\n\n";
+$htmlContent .= "<nav class=\"fixed-nav\">\n";
+$htmlContent .= "<input type=\"text\" class=\"filter-input\" id=\"filterInput\" placeholder=\"Filter plugins...\" oninput=\"filterContent(this.value)\">\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">|</span>\n";
+$htmlContent .= "<span class=\"fixed-nav-title\">Jump to:</span>\n";
+$htmlContent .= "<a href=\"#summary\">Summary</a>\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">•</span>\n";
+$htmlContent .= "<a href=\"#top-100-status\">Top 100 Preview Status</a>\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">•</span>\n";
+$htmlContent .= "<a href=\"#p2-tasks\">P2 Tasks</a>\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">•</span>\n";
+$htmlContent .= "<a href=\"#plugins-with-blueprints\">With Blueprints (" . number_format( count( $pluginsWithBlueprints ) ) . ")</a>\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">•</span>\n";
+$htmlContent .= "<a href=\"#plugins-without-blueprints\">Without Blueprints (Top 100)</a>\n";
+$htmlContent .= "<span class=\"fixed-nav-separator\">•</span>\n";
+$htmlContent .= "<a href=\"#plugins-top-100\">All Top 100</a>\n";
+$htmlContent .= "</nav>\n\n";
 
-$htmlContent .= "<div class=\"toc\">\n";
-$htmlContent .= "<h2>Table of Contents</h2>\n";
-$htmlContent .= "<ul>\n";
-$htmlContent .= "<li><a href=\"#summary\">Summary</a></li>\n";
-$htmlContent .= "<li><a href=\"#top-100-status\">Which Plugins in the Top 100 have a Preview?</a></li>\n";
-$htmlContent .= "<li><a href=\"#p2-tasks\">Top 100 Plugins Without Previews - P2 Tasks</a></li>\n";
-$htmlContent .= "<li><a href=\"#plugins-with-blueprints\">Plugins with Blueprints (" . number_format( count( $pluginsWithBlueprints ) ) . ")</a></li>\n";
-$htmlContent .= "<li><a href=\"#plugins-without-blueprints\">Top 100 Plugins without Blueprints</a></li>\n";
-$htmlContent .= "<li><a href=\"#plugins-top-100\">Top 100 Plugins (All)</a></li>\n";
-$htmlContent .= "</ul>\n";
-$htmlContent .= "</div>\n\n";
+$htmlContent .= "<h1>WordPress Plugin Statistics</h1>\n\n";
 
 echo "Generating summary table...\n";
 $wpSummaryHtml = "<!-- wp:heading -->\n";
@@ -175,7 +192,22 @@ foreach ( $pluginsTop100 as $slug => $plugin ) {
 	$name = html_entity_decode( $plugin['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	$pluginUrl = "https://wordpress.org/plugins/{$slug}/";
 	$playgroundUrl = "https://playground.wordpress.net/?plugin={$slug}";
-	$stepLibraryUrl = "https://akirk.github.io/playground-step-library/#blueprintRecorder&amp;&amp;installPlugin__plugin-.-{$slug}";
+
+	$blueprintData = [
+		'steps' => [
+			[
+				'step' => 'installPlugin',
+				'vars' => [
+					'url' => $slug,
+					'prs' => false,
+					'permalink' => false,
+				],
+			],
+		],
+	];
+	$blueprintJson = json_encode( $blueprintData );
+	$blueprintBase64 = base64_encode( $blueprintJson );
+	$stepLibraryUrl = "https://akirk.github.io/playground-step-library/#{$blueprintBase64}";
 
 	$taskContent = "{$rank}: <a href=\"{$pluginUrl}\">{$name}</a>: <a href=\"{$playgroundUrl}\">Playground</a>, <a href=\"{$stepLibraryUrl}\">Step Library</a>";
 
@@ -244,7 +276,7 @@ foreach ( $sections as $section ) {
 	if ( isset( $firstPlugin['preview_url'] ) ) {
 		$wpSectionHtml .= "<th>Preview</th>";
 	} elseif ( isset( $firstPlugin['url'] ) ) {
-		$wpSectionHtml .= "<th>Playground Link</th>";
+		$wpSectionHtml .= "<th>Step Library</th>";
 	}
 
 	$wpSectionHtml .= "</tr></thead><tbody>";
@@ -256,7 +288,7 @@ foreach ( $sections as $section ) {
 	if ( isset( $firstPlugin['preview_url'] ) ) {
 		$tableHeaderHtml .= "<th>Preview</th>";
 	} elseif ( isset( $firstPlugin['url'] ) ) {
-		$tableHeaderHtml .= "<th>Playground Link</th>";
+		$tableHeaderHtml .= "<th>Step Library</th>";
 	}
 	$tableHeaderHtml .= "</tr></thead>";
 
@@ -279,8 +311,8 @@ foreach ( $sections as $section ) {
 		} elseif ( isset( $plugin['preview_url'] ) && $plugin['preview_url'] === false ) {
 			$row .= "<td>-</td>";
 		} elseif ( isset( $plugin['url'] ) ) {
-			$playgroundUrl = htmlspecialchars( $plugin['url'] );
-			$row .= "<td><a href=\"{$playgroundUrl}\" target=\"_blank\">Open in Playground</a></td>";
+			$stepLibraryUrl = htmlspecialchars( $plugin['url'] );
+			$row .= "<td><a href=\"{$stepLibraryUrl}\" target=\"_blank\">Open in Step Library</a></td>";
 		}
 
 		$row .= "</tr>";
@@ -322,6 +354,37 @@ $htmlContent .= "    }, 2000);\n";
 $htmlContent .= "  }).catch(err => {\n";
 $htmlContent .= "    console.error('Failed to copy:', err);\n";
 $htmlContent .= "    alert('Failed to copy to clipboard');\n";
+$htmlContent .= "  });\n";
+$htmlContent .= "}\n\n";
+$htmlContent .= "function filterContent(searchText) {\n";
+$htmlContent .= "  const filter = searchText.toLowerCase().trim();\n";
+$htmlContent .= "  \n";
+$htmlContent .= "  // Filter table rows\n";
+$htmlContent .= "  document.querySelectorAll('.wp-block-table tbody tr').forEach(row => {\n";
+$htmlContent .= "    const text = row.textContent.toLowerCase();\n";
+$htmlContent .= "    const links = Array.from(row.querySelectorAll('a')).map(a => a.href.toLowerCase());\n";
+$htmlContent .= "    const matchesText = text.includes(filter);\n";
+$htmlContent .= "    const matchesUrl = links.some(url => url.includes(filter));\n";
+$htmlContent .= "    \n";
+$htmlContent .= "    if (filter === '' || matchesText || matchesUrl) {\n";
+$htmlContent .= "      row.classList.remove('hidden');\n";
+$htmlContent .= "    } else {\n";
+$htmlContent .= "      row.classList.add('hidden');\n";
+$htmlContent .= "    }\n";
+$htmlContent .= "  });\n";
+$htmlContent .= "  \n";
+$htmlContent .= "  // Filter P2 tasks\n";
+$htmlContent .= "  document.querySelectorAll('.wp-block-p2-task').forEach(task => {\n";
+$htmlContent .= "    const text = task.textContent.toLowerCase();\n";
+$htmlContent .= "    const links = Array.from(task.querySelectorAll('a')).map(a => a.href.toLowerCase());\n";
+$htmlContent .= "    const matchesText = text.includes(filter);\n";
+$htmlContent .= "    const matchesUrl = links.some(url => url.includes(filter));\n";
+$htmlContent .= "    \n";
+$htmlContent .= "    if (filter === '' || matchesText || matchesUrl) {\n";
+$htmlContent .= "      task.classList.remove('hidden');\n";
+$htmlContent .= "    } else {\n";
+$htmlContent .= "      task.classList.add('hidden');\n";
+$htmlContent .= "    }\n";
 $htmlContent .= "  });\n";
 $htmlContent .= "}\n";
 $htmlContent .= "</script>\n";

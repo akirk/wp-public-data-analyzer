@@ -6,7 +6,7 @@
 		"php": ">=7.4"
 	},
 	"scripts": {
-		"update": "php update-data.php",
+		"update-data": "php update-data.php",
 		"analyze:plugins-with-blueprints": "php analyze-plugins-with-blueprints.php",
 		"analyze:plugins-without-blueprints": "php analyze-plugins-without-blueprints.php",
 		"analyze:plugins-top-100": "php analyze-plugins-top-100.php",
