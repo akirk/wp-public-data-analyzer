@@ -3,7 +3,8 @@
 	"description": "Scripts for analyzing WordPress public data",
 	"type": "project",
 	"require": {
-		"php": ">=7.4"
+		"php": ">=7.4",
+		"phpoffice/phpspreadsheet": "^1.29"
 	},
 	"scripts": {
 		"update-data": "php update-data.php",
@@ -16,6 +17,7 @@
 			"@analyze:plugins-top-100"
 		],
 		"generate:html": "php generate-html-tables.php",
+		"generate:coordination": "php generate-coordination.php",
 		"build": [
 			"@analyze:all",
 			"@generate:html"
