@@ -1,6 +1,7 @@
 # WordPress Public Data Analyzer
 
-Analyzes WordPress plugin data from [wp-public-data](https://github.com/dd32/wp-public-data) to identify plugins with and without blueprints.
+
+Analyzes WordPress plugin data from [wp-public-data](https://github.com/dd32/wp-public-data) to identify plugins with and without blueprints. Notably, it uses the zip download of trunk instead of the huge git checkout.
 
 ## Requirements
 
